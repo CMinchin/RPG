@@ -3,11 +3,13 @@ using System.Threading;
 using System.Drawing;
 using System.Threading.Tasks;
 using Console = Colorful.Console;
+using System.Collections.Generic;
 
 namespace RPG
 {
     class Program
     {
+        public static List<Object> inventory = new List<Object> { };
         static void Options()
         {
             Print("There are no options.", "");
@@ -31,7 +33,17 @@ namespace RPG
         static void start()
         {
             Console.Clear();
+        }
 
+        public class potion
+        {
+            public string name;
+            public int healingEffect;
+            public potion(string Name, int HealingEffect)
+            {
+                name = Name;
+                healingEffect = HealingEffect;
+            }
         }
 
         public class weapon
@@ -63,6 +75,79 @@ namespace RPG
                     return damage;
                 }
             }
+        }
+
+        public static int useItem()
+        {
+            // display the inventory
+            List<string> inventoryNames = new List<string>();
+            foreach(Object item in inventory)
+            {
+                if (item is potion)
+                {
+                    inventoryNames.Add(((potion)item).name);
+                } 
+                else if (item is weapon)
+                {
+                    inventoryNames.Add(((weapon)item).name);
+                }
+                else
+                {
+                    throw new NotImplementedException(); // there is something in my inventory that there should not be
+                }
+            }
+
+            inventoryNames.Add("Back");// put in a back feature
+
+            choice(inventoryNames.ToArray());
+
+            return 1;
+        }
+
+        public static int combat(int enemyMaxHealth, ref weapon enemyWeapon, int playerMaxHealth, ref int playerHealth, ref weapon playerWeapon)
+        {
+            bool run = false;
+            int enemyHealth = enemyMaxHealth;
+            while (enemyHealth > 0 && run != true)
+            {
+                bool skip = false;
+                while (!skip) { // if you need to exit out of one of the menus
+                    skip = false;
+                    int selection = choice(new string[] {"Attack","Use Item or Switch Weapon","Run"});
+                    switch (selection)
+                    {
+                        case 1:
+                            enemyHealth -= playerWeapon.attack();
+                            break;
+                        case 2:
+                            int item = useItem();
+                            if (item == 0 || item == inventory.Count + 1) // either nothing was entered or back was selected
+                            {
+                                skip = true;
+                            }
+                            else if (inventory[item-1] is potion)
+                            {
+                                playerHealth = Math.Min(playerHealth + ((potion)inventory[item - 1]).healingEffect, playerMaxHealth); // heal the player to at most their max health
+                            }
+                            break;
+                        case 3:
+                            run = new Random().Next(0, 1) == 1;
+                            if (run)
+                            {
+                                Console.WriteLine("You successfully ran");
+                            }
+                            else
+                            {
+                                Console.WriteLine("You couldn't escape");
+                            }
+                            break;
+                        default:
+                            Console.WriteLine("You Flinched!");
+                            break;
+                    }
+                }
+            }
+            return -1;
         }
 
         public static int hamming(string input, string expected)
