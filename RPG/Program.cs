@@ -11,8 +11,8 @@ namespace RPG
         static void Options()
         {
             Print("There are no options.", "");
-            Console.Write("\r                     \r");
-            //start();
+            Console.Clear();
+            Main(new string[] { });
         }
         static void quit()
         {
@@ -28,34 +28,43 @@ namespace RPG
             Console.Write(end);
         }
 
-        /*static void start()
+        static void start()
         {
-            Console.Write("\r");
-            string x = Console.ReadLine();
-            switch (x.ToLower())
+            Console.Clear();
+
+        }
+
+        public class weapon
+        {
+            public string name;
+            public int damage;
+            public int maxDurability;
+            public int brokenDamage;
+            public int durability;
+            public weapon(string Name, int Damage, int BrokenDamage, int MaxDurability)
             {
-                case "1":
-                    break;
-                case "start":
-                    break;
-                case "2":
-                    Options();
-                    break;
-                case "options":
-                    Options();
-                    break;
-                case "3":
-                    quit();
-                    break;
-                case "exit":
-                    quit();
-                    break;
-                default:
-                    Print("Learn to spell\n");
-                    start();
-                    break;
+                name = Name;
+                damage = Damage;
+                brokenDamage = BrokenDamage;
+                maxDurability = MaxDurability;
             }
-        }*/
+
+            public int attack()
+            {
+                if (durability > 0) 
+                {
+                    durability -= 1;
+                    return damage;
+                } else if (durability == 0)
+                {
+                    return brokenDamage;
+                } else
+                {
+                    return damage;
+                }
+            }
+        }
+
         public static int hamming(string input, string expected)
         {
             int i = 0;
@@ -68,41 +77,52 @@ namespace RPG
                 ++i;
             }
             int f = 0;
-            while (f - expected.Length > 0 && f - input.Length > 0)
+            while (expected.Length > f && input.Length > f)
             {
-                if (input[f - input.Length] != expected[f - expected.Length])
+                if (input[input.Length - f-1] != expected[expected.Length - f-1])
                 {
                     break;
                 }
                 ++f;
             }
-            
             return f + i; 
         }
-        public static int option(string[] options)
+        public static int choice(string[] options)
         {
             for (int i = 0; i < options.Length; ++i)
             {
-                Console.WriteLine(Convert.ToString(i)+". "+options[i]);
+                Console.WriteLine(Convert.ToString(i+1)+". "+options[i]);
             }
             string input = Console.ReadLine();
-            
+            if (int.TryParse(input, out _))
+            {
+                return Convert.ToInt32(input);
+            } 
             int lowest = -1;
             int highestScore = 0;
             for (int i = 0; i < options.Length; ++i)
             {
                 if (hamming(input, options[i])>highestScore)
                 {
-                    highestScore = hamming(input, options[i]);
+                    highestScore = hamming(input.ToLower(), options[i].ToLower());
                     lowest = i;
                 }
             }
-
-            return lowest; //error if lowest == -1
+            return lowest+1; //error if lowest == -1
         }
         static void Main(string[] args)
         {
-            
+            Console.WriteAscii("RPG");
+            int selected = choice(new string[] { "Start", "Options", "Exit" });
+            if (selected == 1)
+            { // start
+                start();
+            } else if (selected == 2)
+            { // options
+                Options();
+            }
+            Console.WriteLine("Exit");
+            Thread.Sleep(1000);
         }
     }
 }
