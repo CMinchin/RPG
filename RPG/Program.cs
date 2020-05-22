@@ -109,7 +109,8 @@ namespace RPG
             bool run = false;
             int enemyHealth = enemyMaxHealth;
             while (enemyHealth > 0 && run != true)
-            {
+            {// your turn
+                Console.WriteLine("Your health: {0}\nEnemy Health: {1}\nCurrent Weapon: {3}",playerHealth,enemyHealth,playerWeapon.name);
                 bool skip = false;
                 while (!skip) { // if you need to exit out of one of the menus
                     skip = false;
@@ -146,6 +147,11 @@ namespace RPG
                             break;
                     }
                 }
+                // enemy turn
+                int enemyDamage = enemyWeapon.attack();
+                playerHealth -= enemyDamage;
+                Print("the enemy hit you for " + Convert.ToString(enemyDamage) + " and you are now on " + Convert.ToString(playerHealth) + " HP");
+                Console.Clear();
             }
             return -1;
         }
