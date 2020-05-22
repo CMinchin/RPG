@@ -32,7 +32,35 @@ namespace RPG
 
         static void start()
         {
+            int maxHealth = 100;
+            int health = 100;
+            weapon playerWeapon = new weapon("fists", 10, 0, -1);
+            inventory.Add(playerWeapon);
+            weapon irradiatedClub = new weapon("irradiated club", 1, 0, 5);
             Console.Clear();
+            Print("You wake in a world unlike your own.");
+            Thread.Sleep(1000);
+            Print("It's surfaces ravaged by radiation and disease");
+            Thread.Sleep(1000);
+            Console.Clear();
+            Print("Before you can even take a breath an irradiated barbarian slams his club beside your head with a thump.");
+            Thread.Sleep(1000);
+            combat(10,ref irradiatedClub,maxHealth,ref health,ref playerWeapon);
+            Console.Clear();
+            Print("you put the pour creature out of it's missery with one mighty punch. It was only a child.");
+            Print("you notice a potion and the club he slammed beside your head laying beside his sad corpse and decide to pick them up.");
+            Thread.Sleep(2000);
+            Console.Clear();
+            Print("you decide to continue on and forget the horrors you have committed in an attempt to keep your tragic life.");
+            Thread.Sleep(2000);
+            Print("not before long you are met with another barbarian, this one much larger much stronger...");
+            Thread.Sleep(2000);
+            weapon largerIrradiatedClub = new weapon("irradiated club", 50, 25, 50);
+            Print("you remember that you picked up a miysterious potion of the last one as well as it's weapon.");
+            Thread.Sleep(1000);
+            combat(100, ref largerIrradiatedClub, maxHealth, ref health, ref playerWeapon);
+            Print("although defeated, you decide the world would be better off without you.");
+
         }
 
         public class potion
@@ -59,6 +87,7 @@ namespace RPG
                 damage = Damage;
                 brokenDamage = BrokenDamage;
                 maxDurability = MaxDurability;
+                durability = maxDurability;
             }
 
             public int attack()
@@ -108,27 +137,33 @@ namespace RPG
         {
             bool run = false;
             int enemyHealth = enemyMaxHealth;
-            while (enemyHealth > 0 && run != true)
+            while (enemyHealth > 0 && run != true && playerHealth > 0)
             {// your turn
-                Console.WriteLine("Your health: {0}\nEnemy Health: {1}\nCurrent Weapon: {3}",playerHealth,enemyHealth,playerWeapon.name);
+                Console.Clear();
+                Console.WriteLine("Your health: {0}\nEnemy Health: {1}\nCurrent Weapon: {2}",playerHealth,enemyHealth,playerWeapon.name);
                 bool skip = false;
                 while (!skip) { // if you need to exit out of one of the menus
-                    skip = false;
+                    skip = true;
                     int selection = choice(new string[] {"Attack","Use Item or Switch Weapon","Run"});
                     switch (selection)
                     {
                         case 1:
-                            enemyHealth -= playerWeapon.attack();
+                            int damage = playerWeapon.attack();
+                            enemyHealth -= damage;
+                            Print("you attack for "+Convert.ToString(damage)+" damage");
                             break;
                         case 2:
                             int item = useItem();
                             if (item == 0 || item == inventory.Count + 1) // either nothing was entered or back was selected
                             {
-                                skip = true;
+                                skip = false;
                             }
                             else if (inventory[item-1] is potion)
                             {
                                 playerHealth = Math.Min(playerHealth + ((potion)inventory[item - 1]).healingEffect, playerMaxHealth); // heal the player to at most their max health
+                            } else
+                            {
+                                playerWeapon = (weapon)inventory[item-1];
                             }
                             break;
                         case 3:
@@ -147,12 +182,26 @@ namespace RPG
                             break;
                     }
                 }
-                // enemy turn
-                int enemyDamage = enemyWeapon.attack();
-                playerHealth -= enemyDamage;
-                Print("the enemy hit you for " + Convert.ToString(enemyDamage) + " and you are now on " + Convert.ToString(playerHealth) + " HP");
-                Console.Clear();
+                if (enemyHealth <= 0)
+                {
+                    // enemy turn
+                    int enemyDamage = enemyWeapon.attack();
+                    playerHealth -= enemyDamage;
+                    Print("the enemy hit you for " + Convert.ToString(enemyDamage) + " and you are now on " + Convert.ToString(playerHealth) + " HP");
+                    Console.Clear();
+                }
             }
+            if (playerHealth == 0)
+            {
+                Print("you have been defeated, your health is 0");
+                Thread.Sleep(1000);
+            }
+            else
+            {
+                Print("your foe has been defeated");
+            }
+            Thread.Sleep(1000);
+            Console.Clear();
             return -1;
         }
 
