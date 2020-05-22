@@ -12,7 +12,7 @@ namespace RPG
         {
             Print("There are no options.", "");
             Console.Write("\r                     \r");
-            start();
+            //start();
         }
         static void quit()
         {
@@ -28,7 +28,7 @@ namespace RPG
             Console.Write(end);
         }
 
-        static void start()
+        /*static void start()
         {
             Console.Write("\r");
             string x = Console.ReadLine();
@@ -55,11 +55,54 @@ namespace RPG
                     start();
                     break;
             }
+        }*/
+        public static int hamming(string input, string expected)
+        {
+            int i = 0;
+            while (i < input.Length)
+            {
+                if (input[i] != expected[i])
+                {
+                    break;
+                }
+                ++i;
+            }
+            int f = 0;
+            while (f - expected.Length > 0 && f - input.Length > 0)
+            {
+                if (input[f - input.Length] != expected[f - expected.Length])
+                {
+                    break;
+                }
+                ++f;
+            }
+            
+            return f + i; 
         }
+        public static int option(string[] options)
+        {
+            for (int i = 0; i < options.Length; ++i)
+            {
+                Console.WriteLine(Convert.ToString(i)+". "+options[i]);
+            }
+            string input = Console.ReadLine();
+            
+            int lowest = -1;
+            int highestScore = 0;
+            for (int i = 0; i < options.Length; ++i)
+            {
+                if (hamming(input, options[i])>highestScore)
+                {
+                    highestScore = hamming(input, options[i]);
+                    lowest = i;
+                }
+            }
 
+            return lowest; //error if lowest == -1
+        }
         static void Main(string[] args)
         {
-
+            
         }
     }
 }
